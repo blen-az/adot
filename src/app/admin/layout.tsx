@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Ambient } from "@/components/Ambient";
 import { fontClasses } from "@/lib/fonts";
 import "../globals.css";
 
@@ -12,8 +13,11 @@ export const metadata: Metadata = {
 
 export default function AdminRootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={fontClasses}>
-      <body>{children}</body>
+    <html lang="en" className={`dark ${fontClasses}`}>
+      <body>
+        <Ambient />
+        {children}
+      </body>
     </html>
   );
 }

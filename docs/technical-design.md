@@ -10,7 +10,8 @@ It does not approve any open Adot decision (O-01 to O-09).
 | App | Next.js (App Router), TypeScript | Server-rendered crawlable pages (NFR-10); forms work through server actions, with server-side validation (FR-033) |
 | Database | PostgreSQL through Drizzle ORM | Relational data, unique constraints for idempotency, plain SQL migrations for handover (NFR-11) |
 | Local/test database | PGlite (embedded Postgres) | Same dialect and migrations as production, no Docker or install needed |
-| Styling | Plain CSS with design tokens | Small surface; the palette is fixed by the PRD |
+| Assistant | Gemini API with read-only tools, in `src/server/assistant.ts` | FR-090 to FR-101. The model sees only `publicUnitFacts` and approved FAQs. Chats are saved in `assistant_conversations` and `assistant_exchanges`, shown to administrators at `/admin/assistant`, and deleted after the retention period in Settings. Contact details from the in-chat form go straight to the inbox and never reach the model. On Gemini's free tier, Google may keep and review what visitors type, so public launch needs a billing-linked project |
+| Styling | Tailwind CSS v4 and shadcn/ui, with design tokens in `globals.css` | Shared components; colours, type and motion follow the adopted Figma design |
 | Tests | Vitest against in-memory PGlite | Business rules are tested against real SQL constraints |
 
 Set `DATABASE_URL` to use a hosted Postgres. Leave it unset to use PGlite in `DATA_DIR`.

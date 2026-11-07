@@ -6,13 +6,14 @@ import { getDb } from "@/db/client";
 import type { Availability, EnquiryStatus } from "@/db/schema";
 import { clientAddress } from "@/lib/request";
 import { requireUser, SESSION_COOKIE } from "@/lib/session";
+import { deleteConversation } from "@/server/assistant-log";
 import { login, logout } from "@/server/auth";
 import { addEnquiryNote, assignEnquiry, retryNotification, setEnquiryStatus } from "@/server/enquiries";
 import { ValidationError } from "@/server/errors";
 import { consoleMailer } from "@/server/mailer";
 import { saveUpload } from "@/server/media";
 import { hitRateLimit } from "@/server/rate-limit";
-import { setListUnderDiscussion } from "@/server/settings";
+import { setListUnderDiscussion, setAssistantSettings } from "@/server/settings";
 import {
   addMedia,
   archiveUnit,
@@ -185,6 +186,24 @@ export async function retryNotificationAction(form: FormData) {
   const id = text(form, "id");
   await retryNotification(await getDb(), user, id, text(form, "attemptId"), consoleMailer);
   redirect(`/admin/inbox/${id}`);
+}
+
+export async function assistantSettingsAction(form: FormData) {
+  const user = await requireUser();
+  const dailyLimit = Math.max(0, Math.floor(Number(form.get("dailyLimit"))) || 0);
+  await setAssistantSettings(await getDb(), user, {
+    enabled: form.get("enabled") === "on",
+    faqs: String(form.get("faqs") ?? "").slice(0, 8000),
+    dailyLimit,
+    retentionDays: Math.min(365, Math.max(1, Math.floor(Number(form.get("retentionDays"))) || 90)),
+  });
+  redirect("/admin/settings");
+}
+
+export async function deleteConversationAction(form: FormData) {
+  const user = await requireUser();
+  await deleteConversation(await getDb(), user, text(form, "id"));
+  redirect("/admin/assistant");
 }
 
 export async function settingsAction(form: FormData) {

@@ -13,6 +13,7 @@ export default async function ShellLayout({ children }: { children: ReactNode })
           <strong>Adot dashboard</strong>
           <Link href="/admin/units">Units</Link>
           {can(user, "enquiries.read") && <Link href="/admin/inbox">Inbox</Link>}
+          {can(user, "assistant.review") && <Link href="/admin/assistant">Ask Adot</Link>}
           {can(user, "settings.manage") && <Link href="/admin/settings">Settings</Link>}
           <span className="spacer">{user.name}</span>
           <form action={logoutAction}>

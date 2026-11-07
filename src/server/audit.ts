@@ -4,7 +4,7 @@ import { auditLog } from "@/db/schema";
 type Entry = {
   actorId: string | null;
   action: string;
-  entityType: "unit" | "enquiry";
+  entityType: "unit" | "enquiry" | "assistant_conversation";
   entityId: string;
   detail?: Record<string, unknown>;
 };

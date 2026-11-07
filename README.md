@@ -32,3 +32,7 @@ Migrations run automatically when the app first connects to the database.
 ## Simulating a mail outage
 
 Set `MAIL_SIMULATE_FAILURE=1` and submit an enquiry. The lead is saved and the enquiry page shows the failed notification. Unset it, restart, and use Retry. Emails are only logged until a provider is chosen (O-09).
+
+## Design credit
+
+The visual style is adapted from [Design Marketing Company Portfolio](https://www.figma.com/community/file/1599464623928426429) by rofaida ezzat, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It was rebuilt with shadcn/ui for the Adot Complex site.

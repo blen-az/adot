@@ -41,9 +41,16 @@ const sampleUnits: UnitInput[] = [
 ];
 
 const placeholder = (label: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-  <rect width="800" height="600" fill="#22262a"/>
-  <text x="400" y="290" fill="#b99552" font-family="sans-serif" font-size="36" text-anchor="middle">Placeholder image</text>
-  <text x="400" y="340" fill="#f5f2eb" font-family="sans-serif" font-size="24" text-anchor="middle">${label}</text>
+  <defs>
+    <radialGradient id="purple"><stop offset="0" stop-color="#a855f7" stop-opacity="0.55"/><stop offset="1" stop-color="#a855f7" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pink"><stop offset="0" stop-color="#ec4899" stop-opacity="0.45"/><stop offset="1" stop-color="#ec4899" stop-opacity="0"/></radialGradient>
+    <linearGradient id="text"><stop offset="0" stop-color="#c084fc"/><stop offset="0.5" stop-color="#ec4899"/><stop offset="1" stop-color="#ef4444"/></linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#0b0810"/>
+  <circle cx="150" cy="110" r="420" fill="url(#purple)"/>
+  <circle cx="680" cy="520" r="400" fill="url(#pink)"/>
+  <text x="400" y="290" fill="url(#text)" font-family="system-ui, sans-serif" font-size="44" font-weight="500" text-anchor="middle">Placeholder image</text>
+  <text x="400" y="340" fill="#fff" fill-opacity="0.7" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle">${label}</text>
 </svg>`;
 
 async function main() {

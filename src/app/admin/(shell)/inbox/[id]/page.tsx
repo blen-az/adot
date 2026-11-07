@@ -4,6 +4,7 @@ import { getDb } from "@/db/client";
 import { enquiryStatusEnum } from "@/db/schema";
 import { orNotFound, requireUser } from "@/lib/session";
 import { getEnquiryDetail, listAssignees } from "@/server/enquiries";
+import { can } from "@/server/permissions";
 import {
   enquiryAssignAction,
   enquiryNoteAction,
@@ -33,6 +34,18 @@ export default async function EnquiryPage({ params }: { params: Promise<{ id: st
           <dl className="facts">
             <dt>Type</dt>
             <dd>{enquiry.type.replace("_", " ")}</dd>
+            {enquiry.source === "assistant" && (
+              <>
+                <dt>Source</dt>
+                <dd>
+                  {enquiry.assistantConversationId && can(user, "assistant.review") ? (
+                    <Link href={`/admin/assistant/${enquiry.assistantConversationId}`}>Ask Adot chat</Link>
+                  ) : (
+                    "Ask Adot"
+                  )}
+                </dd>
+              </>
+            )}
             {enquiry.unitSnapshot && (
               <>
                 <dt>Unit</dt>

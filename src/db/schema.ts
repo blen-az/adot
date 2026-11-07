@@ -22,6 +22,8 @@ export const billingPeriodEnum = pgEnum("billing_period", ["monthly", "quarterly
 export const enquiryTypeEnum = pgEnum("enquiry_type", ["unit", "future_availability", "gym", "general"]);
 export const enquiryStatusEnum = pgEnum("enquiry_status", ["new", "contacted", "viewing_arranged", "closed", "spam"]);
 export const notificationStatusEnum = pgEnum("notification_status", ["pending", "sending", "sent", "failed"]);
+export const enquirySourceEnum = pgEnum("enquiry_source", ["website", "assistant"]);
+export const assistantOutcomeEnum = pgEnum("assistant_outcome", ["answered", "unanswered", "failed"]);
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -93,6 +95,35 @@ export const unitMedia = pgTable(
   (t) => [index("unit_media_unit_idx").on(t.unitId, t.position)],
 );
 
+export const assistantConversations = pgTable(
+  "assistant_conversations",
+  {
+    id: uuid("id").primaryKey(),
+    locale: text("locale").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("assistant_conversations_recent_idx").on(t.lastMessageAt)],
+);
+
+export const assistantExchanges = pgTable(
+  "assistant_exchanges",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => assistantConversations.id, { onDelete: "cascade" }),
+    question: text("question").notNull(),
+    answer: text("answer").notNull().default(""),
+    outcome: assistantOutcomeEnum("outcome").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("assistant_exchanges_conversation_idx").on(t.conversationId, t.createdAt),
+    index("assistant_exchanges_recent_idx").on(t.createdAt),
+  ],
+);
+
 export type UnitSnapshot = { title: string; reference: string; floor: string };
 
 export const enquiries = pgTable(
@@ -115,6 +146,10 @@ export const enquiries = pgTable(
     message: text("message").notNull(),
     marketingConsent: boolean("marketing_consent").notNull().default(false),
     locale: text("locale").notNull(),
+    source: enquirySourceEnum("source").notNull().default("website"),
+    assistantConversationId: uuid("assistant_conversation_id").references(() => assistantConversations.id, {
+      onDelete: "set null",
+    }),
     status: enquiryStatusEnum("status").notNull().default("new"),
     assigneeId: uuid("assignee_id").references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
@@ -184,5 +219,7 @@ export type UnitMedia = typeof unitMedia.$inferSelect;
 export type Enquiry = typeof enquiries.$inferSelect;
 export type Role = (typeof roleEnum.enumValues)[number];
 export type EnquiryStatus = (typeof enquiryStatusEnum.enumValues)[number];
+export type EnquirySource = (typeof enquirySourceEnum.enumValues)[number];
+export type AssistantOutcome = (typeof assistantOutcomeEnum.enumValues)[number];
 export type Availability = (typeof availabilityEnum.enumValues)[number];
 export type Publication = (typeof publicationEnum.enumValues)[number];

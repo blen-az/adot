@@ -1,8 +1,17 @@
 "use client";
 
+import { CircleCheckIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { submitEnquiryAction, type EnquiryFormState } from "@/app/[locale]/actions";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { dictionary, type Locale } from "@/i18n";
 
 type Props = {
@@ -21,18 +30,23 @@ export function EnquiryForm({ locale, idempotencyKey, unit }: Props) {
 
   if (state.status === "saved") {
     return (
-      <div className="alert success" role="status">
-        <h2>{t.successHeading}</h2>
-        <p>
-          {t.successReference}: <span className="reference">{state.reference}</span>
-        </p>
-        {state.unitTitle && (
+      <Alert role="status">
+        <CircleCheckIcon />
+        <AlertTitle>
+          <h2 className="mb-1">{t.successHeading}</h2>
+        </AlertTitle>
+        <AlertDescription>
           <p>
-            {t.successUnit}: {state.unitTitle}
+            {t.successReference}: <span className="reference">{state.reference}</span>
           </p>
-        )}
-        <p>{t.successNext}</p>
-      </div>
+          {state.unitTitle && (
+            <p>
+              {t.successUnit}: {state.unitTitle}
+            </p>
+          )}
+          <p>{t.successNext}</p>
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -45,47 +59,53 @@ export function EnquiryForm({ locale, idempotencyKey, unit }: Props) {
     "aria-describedby": invalid(field) ? `${field}-error` : undefined,
   });
   const fieldError = (field: keyof typeof t.errors) =>
-    invalid(field) && (
-      <span className="field-error" id={`${field}-error`}>
-        {t.errors[field]}
-      </span>
-    );
-  const optional = <span className="hint">({t.optional})</span>;
+    invalid(field) && <FieldError id={`${field}-error`}>{t.errors[field]}</FieldError>;
+  const optional = <span className="font-normal text-muted-foreground">({t.optional})</span>;
 
   return (
-    <form action={action} className="panel" noValidate>
-      <h2>{unitMode ? t.unitHeading : t.futureHeading}</h2>
-      {unitMode && unit ? (
-        <p>
-          {t.enquiringAbout}: <strong>{unit.title}</strong> ({unit.reference})
-        </p>
-      ) : (
-        <p>{t.futureIntro}</p>
-      )}
-
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <h2 className="mb-0">{unitMode ? t.unitHeading : t.futureHeading}</h2>
+        </CardTitle>
+        <CardDescription>
+          {unitMode && unit ? (
+            <>
+              {t.enquiringAbout}: <strong>{unit.title}</strong> ({unit.reference})
+            </>
+          ) : (
+            t.futureIntro
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+    <form action={action} className="flex flex-col gap-4" noValidate>
       {state.status === "unit_unavailable" && !switched && (
-        <div className="alert warning" role="alert">
-          <strong>{t.staleHeading}</strong>
-          <p>{t.staleBody}</p>
-          <button type="button" className="button small" onClick={() => setSwitched(true)}>
-            {t.staleSwitch}
-          </button>
-        </div>
+        <Alert>
+          <TriangleAlertIcon />
+          <AlertTitle>{t.staleHeading}</AlertTitle>
+          <AlertDescription>
+            <p>{t.staleBody}</p>
+            <Button type="button" size="sm" onClick={() => setSwitched(true)}>
+              {t.staleSwitch}
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
       {state.status === "invalid" && (
-        <p className="alert" role="alert">
-          {t.errorSummary}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{t.errorSummary}</AlertDescription>
+        </Alert>
       )}
       {state.status === "failed" && (
-        <p className="alert" role="alert">
-          {t.failed}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{t.failed}</AlertDescription>
+        </Alert>
       )}
       {state.status === "rate_limited" && (
-        <p className="alert" role="alert">
-          {t.rateLimited}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{t.rateLimited}</AlertDescription>
+        </Alert>
       )}
 
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
@@ -98,88 +118,98 @@ export function EnquiryForm({ locale, idempotencyKey, unit }: Props) {
         <input id="website" name="website" tabIndex={-1} autoComplete="off" />
       </div>
 
+      <FieldGroup className="gap-4">
       <div className="field-grid">
-        <div className="field">
-          <label htmlFor="name">{t.name}</label>
-          <input {...fieldProps("name")} autoComplete="name" required />
+        <Field data-invalid={invalid("name") || undefined}>
+          <FieldLabel htmlFor="name">{t.name}</FieldLabel>
+          <Input {...fieldProps("name")} autoComplete="name" required />
           {fieldError("name")}
-        </div>
-        <div className="field">
-          <label htmlFor="phone">{t.phone}</label>
-          <input {...fieldProps("phone")} type="tel" autoComplete="tel" required />
-          <span className="hint">{t.phoneHint}</span>
+        </Field>
+        <Field data-invalid={invalid("phone") || undefined}>
+          <FieldLabel htmlFor="phone">{t.phone}</FieldLabel>
+          <Input {...fieldProps("phone")} type="tel" autoComplete="tel" required />
+          <FieldDescription>{t.phoneHint}</FieldDescription>
           {fieldError("phone")}
-        </div>
+        </Field>
       </div>
-      <div className="field">
-        <label htmlFor="intendedUse">{t.intendedUse}</label>
-        <input {...fieldProps("intendedUse")} required />
-        {fieldError("intendedUse")}
-      </div>
-      <div className="field">
-        <label htmlFor="message">{t.message}</label>
-        <textarea {...fieldProps("message")} rows={4} required />
-        {fieldError("message")}
-      </div>
+      <Field data-invalid={invalid("intendedUse") || undefined}>
+        <FieldLabel htmlFor="intendedUse">{t.intendedUse}</FieldLabel>
+        <Input {...fieldProps("intendedUse")} required />
+          {fieldError("intendedUse")}
+        </Field>
+      <Field data-invalid={invalid("message") || undefined}>
+        <FieldLabel htmlFor="message">{t.message}</FieldLabel>
+        <Textarea {...fieldProps("message")} rows={4} required />
+          {fieldError("message")}
+        </Field>
       <div className="field-grid">
-        <div className="field">
-          <label htmlFor="email">
+        <Field data-invalid={invalid("email") || undefined}>
+          <FieldLabel htmlFor="email">
             {t.email} {optional}
-          </label>
-          <input {...fieldProps("email")} type="email" autoComplete="email" />
+          </FieldLabel>
+          <Input {...fieldProps("email")} type="email" autoComplete="email" />
           {fieldError("email")}
-        </div>
-        <div className="field">
-          <label htmlFor="company">
+        </Field>
+        <Field data-invalid={invalid("company") || undefined}>
+          <FieldLabel htmlFor="company">
             {t.company} {optional}
-          </label>
-          <input {...fieldProps("company")} autoComplete="organization" />
+          </FieldLabel>
+          <Input {...fieldProps("company")} autoComplete="organization" />
           {fieldError("company")}
-        </div>
+        </Field>
         {unitMode ? (
-          <div className="field">
-            <label htmlFor="preferredDate">
+          <Field data-invalid={invalid("preferredDate") || undefined}>
+            <FieldLabel htmlFor="preferredDate">
               {t.preferredDate} {optional}
-            </label>
-            <input {...fieldProps("preferredDate")} type="date" />
-            <span className="hint">{t.preferredDateHint}</span>
-            {fieldError("preferredDate")}
-          </div>
+            </FieldLabel>
+            <Input {...fieldProps("preferredDate")} type="date" />
+            <FieldDescription>{t.preferredDateHint}</FieldDescription>
+          {fieldError("preferredDate")}
+        </Field>
         ) : (
-          <div className="field">
-            <label htmlFor="desiredArea">
+          <Field data-invalid={invalid("desiredArea") || undefined}>
+            <FieldLabel htmlFor="desiredArea">
               {t.desiredArea} {optional}
-            </label>
-            <input {...fieldProps("desiredArea")} />
-            {fieldError("desiredArea")}
-          </div>
+            </FieldLabel>
+            <Input {...fieldProps("desiredArea")} />
+          {fieldError("desiredArea")}
+        </Field>
         )}
-        <div className="field">
-          <label htmlFor="contactMethod">
+        <Field>
+          <FieldLabel htmlFor="contactMethod">
             {t.contactMethod} {optional}
-          </label>
-          <select id="contactMethod" name="contactMethod" defaultValue={state.values.contactMethod ?? ""}>
-            <option value="">{t.noPreference}</option>
-            <option value="phone">{t.methods.phone}</option>
-            <option value="email">{t.methods.email}</option>
-            <option value="whatsapp">{t.methods.whatsapp}</option>
-          </select>
-        </div>
+          </FieldLabel>
+          <NativeSelect id="contactMethod" name="contactMethod" defaultValue={state.values.contactMethod ?? ""}>
+            <NativeSelectOption value="">{t.noPreference}</NativeSelectOption>
+            <NativeSelectOption value="phone">{t.methods.phone}</NativeSelectOption>
+            <NativeSelectOption value="email">{t.methods.email}</NativeSelectOption>
+            <NativeSelectOption value="whatsapp">{t.methods.whatsapp}</NativeSelectOption>
+          </NativeSelect>
+        </Field>
       </div>
+      </FieldGroup>
 
-      <p className="hint">
+      <p className="hint my-0">
         {t.notice} <Link href={`/${locale}/privacy`}>{t.privacyLink}</Link>
       </p>
-      <label className="check">
-        <input type="checkbox" name="marketingConsent" defaultChecked={state.values.marketingConsent === "on"} />
-        <span>
-          {t.marketing} {optional}
-        </span>
-      </label>
+      <Field orientation="horizontal">
+        <Checkbox
+          id="marketingConsent"
+          name="marketingConsent"
+          defaultChecked={state.values.marketingConsent === "on"}
+        />
+        <FieldLabel className="font-normal" htmlFor="marketingConsent">
+          <span>
+            {t.marketing} {optional}
+          </span>
+        </FieldLabel>
+      </Field>
 
-      <button className="button" type="submit" disabled={pending}>
+      <Button className="self-start" type="submit" disabled={pending}>
         {pending ? t.sending : t.submit}
-      </button>
+      </Button>
     </form>
+      </CardContent>
+    </Card>
   );
 }

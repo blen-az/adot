@@ -4,8 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { UnitDetail } from "@/components/UnitDetail";
+import { buttonVariants } from "@/components/ui/button";
 import { getDb } from "@/db/client";
-import { dictionary, pick, type Locale } from "@/i18n";
+import { dictionary, isLocale, pick, type Locale } from "@/i18n";
 import { getPublicUnit } from "@/server/units";
 
 type Params = { params: Promise<{ locale: Locale; slug: string }> };
@@ -22,6 +23,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function UnitPage({ params }: Params) {
   const { locale, slug } = await params;
+  if (!isLocale(locale)) notFound();
   const t = dictionary(locale);
   const result = await getPublicUnit(await getDb(), slug);
   if (result.state === "not_found") notFound();
@@ -32,10 +34,10 @@ export default async function UnitPage({ params }: Params) {
         <h1>{t.spaces.unavailableHeading}</h1>
         <p>{t.spaces.unavailableBody}</p>
         <div className="actions">
-          <Link className="button" href={`/${locale}/spaces`}>
+          <Link className={buttonVariants()} href={`/${locale}/spaces`}>
             {t.spaces.browse}
           </Link>
-          <Link className="button secondary" href={`/${locale}/enquire`}>
+          <Link className={buttonVariants({ variant: "outline" })} href={`/${locale}/enquire`}>
             {t.spaces.futureLink}
           </Link>
         </div>
@@ -50,11 +52,11 @@ export default async function UnitPage({ params }: Params) {
         <Link href={`/${locale}/spaces`}>{t.spaces.back}</Link>
       </p>
       <UnitDetail unit={unit} locale={locale}>
-        <a className="button gold" href="#enquiry">
+        <a className={buttonVariants()} href="#enquiry">
           {t.spaces.enquire}
         </a>
       </UnitDetail>
-      <section id="enquiry" className="narrow">
+      <section id="enquiry" className="narrow mt-6">
         <EnquiryForm
           locale={locale}
           idempotencyKey={randomUUID()}

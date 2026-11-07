@@ -1,14 +1,26 @@
 import Link from "next/link";
 import { getDb } from "@/db/client";
-import { enquiryStatusEnum, type EnquiryStatus } from "@/db/schema";
+import { enquirySourceEnum, enquiryStatusEnum, type EnquirySource, type EnquiryStatus } from "@/db/schema";
 import { orNotFound, requireUser } from "@/lib/session";
 import { listAssignees, listInbox } from "@/server/enquiries";
 import { listUnitsForStaff } from "@/server/units";
 
-type Search = { status?: string; unitId?: string; assigneeId?: string; from?: string; to?: string; search?: string };
+type Search = {
+  status?: string;
+  unitId?: string;
+  assigneeId?: string;
+  source?: string;
+  from?: string;
+  to?: string;
+  search?: string;
+};
 
 function isStatus(value?: string): value is EnquiryStatus {
   return (enquiryStatusEnum.enumValues as readonly string[]).includes(value ?? "");
+}
+
+function isSource(value?: string): value is EnquirySource {
+  return (enquirySourceEnum.enumValues as readonly string[]).includes(value ?? "");
 }
 
 const uuid = /^[0-9a-f-]{36}$/i;
@@ -24,6 +36,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
     status: isStatus(search.status) ? search.status : undefined,
     unitId: uuid.test(search.unitId ?? "") ? search.unitId : undefined,
     assigneeId: uuid.test(search.assigneeId ?? "") ? search.assigneeId : undefined,
+    source: isSource(search.source) ? search.source : undefined,
     from: day.test(search.from ?? "") ? search.from : undefined,
     to: day.test(search.to ?? "") ? search.to : undefined,
     search: search.search,
@@ -72,6 +85,14 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           </select>
         </div>
         <div className="field">
+          <label htmlFor="source">Source</label>
+          <select id="source" name="source" defaultValue={search.source ?? ""}>
+            <option value="">Any</option>
+            <option value="website">Website form</option>
+            <option value="assistant">Ask Adot</option>
+          </select>
+        </div>
+        <div className="field">
           <label htmlFor="from">From</label>
           <input id="from" name="from" type="date" defaultValue={search.from} />
         </div>
@@ -107,7 +128,10 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
                     <Link href={`/admin/inbox/${enquiry.id}`}>{enquiry.reference}</Link>
                   </td>
                   <td>{enquiry.createdAt.toLocaleString("en-GB", { timeZone: "Africa/Addis_Ababa" })}</td>
-                  <td>{enquiry.unitSnapshot?.title ?? enquiry.type.replace("_", " ")}</td>
+                  <td>
+                    {enquiry.unitSnapshot?.title ?? enquiry.type.replace("_", " ")}
+                    {enquiry.source === "assistant" && " (Ask Adot)"}
+                  </td>
                   <td>
                     {enquiry.name}
                     <br />

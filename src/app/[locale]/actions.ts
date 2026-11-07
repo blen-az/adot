@@ -1,9 +1,10 @@
 "use server";
 
 import { after } from "next/server";
-import { getDb } from "@/db/client";
+import { getDb, type Db } from "@/db/client";
 import { clientAddress } from "@/lib/request";
-import { processNotifications, submitEnquiry, type EnquiryInput } from "@/server/enquiries";
+import { knownConversation } from "@/server/assistant-log";
+import { processNotifications, submitEnquiry, type EnquiryInput, type EnquiryOrigin } from "@/server/enquiries";
 import { consoleMailer } from "@/server/mailer";
 import { hitRateLimit } from "@/server/rate-limit";
 
@@ -24,7 +25,7 @@ function notificationRecipients() {
     .filter(Boolean);
 }
 
-export async function submitEnquiryAction(_previous: EnquiryFormState, form: FormData): Promise<EnquiryFormState> {
+async function saveEnquiry(form: FormData, origin?: (db: Db) => Promise<EnquiryOrigin>): Promise<EnquiryFormState> {
   const values = Object.fromEntries(
     [...form.entries()].filter((entry): entry is [string, string] => typeof entry[1] === "string"),
   );
@@ -43,6 +44,7 @@ export async function submitEnquiryAction(_previous: EnquiryFormState, form: For
       db,
       { ...values, marketingConsent: values.marketingConsent === "on" } as EnquiryInput,
       notificationRecipients(),
+      await origin?.(db),
     );
     if (result.status === "invalid") return { values, fields: result.fields, status: "invalid" };
     if (result.status === "unit_unavailable") return { ...retained, status: "unit_unavailable" };
@@ -52,4 +54,21 @@ export async function submitEnquiryAction(_previous: EnquiryFormState, form: For
     console.error("Enquiry submission failed", error);
     return { ...retained, status: "failed" };
   }
+}
+
+export async function submitEnquiryAction(_previous: EnquiryFormState, form: FormData) {
+  return saveEnquiry(form);
+}
+
+/** The short form inside Ask Adot. It becomes a normal inbox enquiry, linked to the chat. */
+export async function submitLeadAction(_previous: EnquiryFormState, form: FormData) {
+  form.set("type", "future_availability");
+  form.set("unitId", "");
+  form.set("message", String(form.get("intendedUse") ?? ""));
+  const conversationId = form.get("conversationId");
+  form.delete("conversationId");
+  return saveEnquiry(form, async (db) => ({
+    source: "assistant",
+    assistantConversationId: await knownConversation(db, conversationId),
+  }));
 }

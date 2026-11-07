@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { dictionary, formatDate, formatNumber, pick, type Locale } from "@/i18n";
 import type { UnitWithMedia } from "@/server/units";
 import { rentLabel } from "./rent";
@@ -19,7 +20,8 @@ export function UnitDetail({ unit, locale, children }: { unit: UnitWithMedia; lo
             <img key={media.id} src={`/media/${media.fileName}`} alt={pick(locale, media.altEn, media.altAm).text} />
           ))}
         </div>
-        <div>
+        <Card className="self-start">
+          <CardContent className="text-base">
           <dl className="facts">
             <dt>{t.spaces.status}</dt>
             <dd>{t.availability[unit.availability]}</dd>
@@ -68,7 +70,8 @@ export function UnitDetail({ unit, locale, children }: { unit: UnitWithMedia; lo
             </>
           )}
           {children}
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );

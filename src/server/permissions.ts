@@ -6,10 +6,11 @@ export type Permission =
   | "units.availability"
   | "enquiries.read"
   | "enquiries.readAll"
-  | "settings.manage";
+  | "settings.manage"
+  | "assistant.review";
 
 const grants: Record<Role, Permission[]> = {
-  administrator: ["units.edit", "units.availability", "enquiries.read", "enquiries.readAll", "settings.manage"],
+  administrator: ["units.edit", "units.availability", "enquiries.read", "enquiries.readAll", "settings.manage", "assistant.review"],
   leasing_staff: ["units.edit", "units.availability", "enquiries.read"],
   content_editor: ["units.edit"],
 };

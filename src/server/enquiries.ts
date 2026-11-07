@@ -10,6 +10,7 @@ import {
   units,
   users,
   type Enquiry,
+  type EnquirySource,
   type EnquiryStatus,
 } from "@/db/schema";
 import { recordAudit } from "./audit";
@@ -72,7 +73,15 @@ function savedResult(enquiry: Enquiry): SubmitResult {
   return { status: "saved", reference: enquiry.reference, unitTitle: enquiry.unitSnapshot?.title ?? null };
 }
 
-export async function submitEnquiry(db: Db, input: EnquiryInput, recipients: string[]): Promise<SubmitResult> {
+/** Set by the server, never from form input, so a visitor cannot choose it. */
+export type EnquiryOrigin = { source: EnquirySource; assistantConversationId: string | null };
+
+export async function submitEnquiry(
+  db: Db,
+  input: EnquiryInput,
+  recipients: string[],
+  origin: EnquiryOrigin = { source: "website", assistantConversationId: null },
+): Promise<SubmitResult> {
   const parsed = enquiryInput.safeParse(input);
   if (!parsed.success) return { status: "invalid", fields: [...new Set(parsed.error.issues.map((i) => i.message))] };
   const data = parsed.data;
@@ -93,7 +102,7 @@ export async function submitEnquiry(db: Db, input: EnquiryInput, recipients: str
   const inserted = await db.transaction(async (tx) => {
     const [row] = await tx
       .insert(enquiries)
-      .values({ ...data, unitId, unitSnapshot: snapshot, reference: newReference(new Date()) })
+      .values({ ...data, ...origin, unitId, unitSnapshot: snapshot, reference: newReference(new Date()) })
       .onConflictDoNothing({ target: enquiries.idempotencyKey })
       .returning();
     if (row && recipients.length) {
@@ -162,6 +171,7 @@ export type InboxFilters = {
   status?: EnquiryStatus;
   unitId?: string;
   assigneeId?: string;
+  source?: EnquirySource;
   from?: string;
   to?: string;
   search?: string;
@@ -179,6 +189,7 @@ export async function listInbox(db: Db, actor: Actor, filters: InboxFilters = {}
         filters.status ? eq(enquiries.status, filters.status) : undefined,
         filters.unitId ? eq(enquiries.unitId, filters.unitId) : undefined,
         filters.assigneeId ? eq(enquiries.assigneeId, filters.assigneeId) : undefined,
+        filters.source ? eq(enquiries.source, filters.source) : undefined,
         filters.from ? gte(enquiries.createdAt, new Date(`${filters.from}T00:00:00+03:00`)) : undefined,
         filters.to ? lte(enquiries.createdAt, new Date(`${filters.to}T23:59:59.999+03:00`)) : undefined,
         search
