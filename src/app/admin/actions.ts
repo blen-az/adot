@@ -14,6 +14,7 @@ import { consoleMailer } from "@/server/mailer";
 import { saveUpload } from "@/server/media";
 import { hitRateLimit } from "@/server/rate-limit";
 import { setListUnderDiscussion, setAssistantSettings } from "@/server/settings";
+import { resetSiteImage, setSiteImage } from "@/server/site-images";
 import {
   addMedia,
   archiveUnit,
@@ -210,4 +211,32 @@ export async function settingsAction(form: FormData) {
   const user = await requireUser();
   await setListUnderDiscussion(await getDb(), user, form.get("listUnderDiscussion") === "on");
   redirect("/admin/settings");
+}
+
+async function imagesStep(step: () => Promise<unknown>, done: string) {
+  try {
+    await step();
+  } catch (error) {
+    if (!(error instanceof ValidationError)) throw error;
+    redirect(`/admin/images?error=${encodeURIComponent(error.issues.join(". "))}`);
+  }
+  redirect(`/admin/images?done=${encodeURIComponent(done)}`);
+}
+
+export async function uploadSiteImageAction(form: FormData) {
+  const user = await requireUser();
+  const db = await getDb();
+  await imagesStep(async () => {
+    const file = form.get("file");
+    if (!(file instanceof File) || file.size === 0) throw new ValidationError(["Choose an image to upload"]);
+    if (!text(form, "altEn").trim()) throw new ValidationError(["English alternative text is required"]);
+    const fileName = await saveUpload(Buffer.from(await file.arrayBuffer()));
+    await setSiteImage(db, user, text(form, "slot"), { fileName, altEn: text(form, "altEn"), altAm: text(form, "altAm") });
+  }, "Image replaced. It is live on the public site now.");
+}
+
+export async function resetSiteImageAction(form: FormData) {
+  const user = await requireUser();
+  const db = await getDb();
+  await imagesStep(() => resetSiteImage(db, user, text(form, "slot")), "Image reset to the original photo.");
 }

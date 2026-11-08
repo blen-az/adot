@@ -4,7 +4,8 @@ import { join } from "node:path";
 import { dataDir } from "@/db/client";
 import { ValidationError } from "./errors";
 
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+// Vercel rejects function request bodies over 4.5 MB, so uploads stay under that.
+export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 const contentTypes: Record<string, string> = {
   jpg: "image/jpeg",
@@ -67,7 +68,7 @@ async function store(bytes: Buffer, extension: string) {
 }
 
 export async function saveUpload(bytes: Buffer) {
-  if (bytes.length > MAX_UPLOAD_BYTES) throw new ValidationError(["Images must be 5 MB or smaller"]);
+  if (bytes.length > MAX_UPLOAD_BYTES) throw new ValidationError(["Images must be 4 MB or smaller"]);
   const extension = sniffImage(bytes);
   if (!extension) throw new ValidationError(["Images must be JPEG, PNG or WebP"]);
   return store(bytes, extension);

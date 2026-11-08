@@ -7,20 +7,23 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { getDb } from "@/db/client";
 import { dictionary, isLocale, type Locale } from "@/i18n";
+import { getSiteImages } from "@/server/site-images";
 import { listPublicUnits } from "@/server/units";
 
 const destinations = [
-  { key: "cinema", image: "cinema-auditorium-angled-card.webp" },
-  { key: "gym", image: "adot-gymnasium-interior-card.webp" },
-  { key: "directory", image: "adot-multiplex-exterior-card.webp" },
-  { key: "visit", image: "adot-building-facade-card.webp" },
+  { key: "cinema", slot: "auditoriumAngled" },
+  { key: "gym", slot: "gym" },
+  { key: "directory", slot: "exterior" },
+  { key: "visit", slot: "facade" },
 ] as const;
 
 export default async function HomePage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const t = dictionary(locale);
-  const units = (await listPublicUnits(await getDb())).slice(0, 3);
+  const db = await getDb();
+  const units = (await listPublicUnits(db)).slice(0, 3);
+  const images = await getSiteImages(db);
   return (
     <>
       <section className="hero">
@@ -50,11 +53,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
 
       <section className="container section">
         <ul className="card-grid grid-cols-2 lg:grid-cols-4">
-          {destinations.map(({ key, image }) => (
+          {destinations.map(({ key, slot }) => (
             <li key={key}>
               <Link className="block h-full text-foreground no-underline" href={`/${locale}/${key}`}>
                 <Card className="h-full transition-all duration-300 hover:ring-foreground/20">
-                  <img className="aspect-4/3 w-full object-cover" src={`/assets/images/${image}`} alt="" loading="lazy" />
+                  <img className="aspect-4/3 w-full object-cover" src={images[slot].cardSrc} alt="" loading="lazy" />
                   <CardContent>
                     <CardTitle className="text-lg">{t.nav[key]}</CardTitle>
                   </CardContent>

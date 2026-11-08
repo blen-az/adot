@@ -246,6 +246,32 @@ export async function listUnitsForStaff(db: Db, actor: Actor) {
   return db.select().from(units).orderBy(desc(units.updatedAt));
 }
 
+export async function listUnitsWithMediaForStaff(db: Db, actor: Actor) {
+  return withMedia(db, await listUnitsForStaff(db, actor));
+}
+
+/** Counts and to-do items for the dashboard overview. Archived units are left out of the to-do list. */
+export async function unitSummary(db: Db, actor: Actor) {
+  const all = await listUnitsWithMediaForStaff(db, actor);
+  const count = <T extends string>(values: T[]) =>
+    values.reduce<Partial<Record<T, number>>>((acc, value) => ({ ...acc, [value]: (acc[value] ?? 0) + 1 }), {});
+  const published = all.filter((unit) => unit.publication === "published");
+  const attention = all
+    .filter((unit) => unit.publication !== "archived")
+    .map((unit) => ({
+      unit,
+      issues: unit.publication === "draft" ? publishIssues(unit) : [],
+      warnings: translationWarnings(unit),
+    }))
+    .filter((item) => item.issues.length > 0 || item.warnings.length > 0);
+  return {
+    total: all.length,
+    byPublication: count(all.map((unit) => unit.publication)),
+    byAvailability: count(published.map((unit) => unit.availability)),
+    attention,
+  };
+}
+
 export async function addMedia(
   db: Db,
   actor: Actor,

@@ -3,6 +3,7 @@ import { ForbiddenError } from "./errors";
 
 export type Permission =
   | "units.edit"
+  | "content.edit"
   | "units.availability"
   | "enquiries.read"
   | "enquiries.readAll"
@@ -10,9 +11,17 @@ export type Permission =
   | "assistant.review";
 
 const grants: Record<Role, Permission[]> = {
-  administrator: ["units.edit", "units.availability", "enquiries.read", "enquiries.readAll", "settings.manage", "assistant.review"],
+  administrator: [
+    "units.edit",
+    "content.edit",
+    "units.availability",
+    "enquiries.read",
+    "enquiries.readAll",
+    "settings.manage",
+    "assistant.review",
+  ],
   leasing_staff: ["units.edit", "units.availability", "enquiries.read"],
-  content_editor: ["units.edit"],
+  content_editor: ["units.edit", "content.edit"],
 };
 
 export type Actor = { id: string; role: Role };

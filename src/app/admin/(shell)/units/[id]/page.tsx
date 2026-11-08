@@ -13,6 +13,7 @@ import {
   unitLifecycleAction,
   uploadMediaAction,
 } from "../../../actions";
+import { ImageUploadField, UploadButton } from "@/components/admin/ImageUploadField";
 import { UnitForm } from "../UnitForm";
 
 const uuid = /^[0-9a-f-]{36}$/i;
@@ -122,6 +123,9 @@ export default async function UnitEditPage({
       <h2>Images</h2>
       <section className="panel">
         <p className="hint">The first image is the cover. Use only genuine, approved Adot photographs.</p>
+        {unit.media.length === 0 && (
+          <p className="alert warning">This unit has no images yet. Add at least one before publishing.</p>
+        )}
         {unit.media.map((media, index) => (
           <div className="media-row" key={media.id}>
             <img src={`/media/${media.fileName}`} alt={media.altEn} />
@@ -148,13 +152,11 @@ export default async function UnitEditPage({
             </form>
           </div>
         ))}
-        <form action={uploadMediaAction}>
+        <form action={uploadMediaAction} className="image-form">
+          <h3>Add an image</h3>
           <input type="hidden" name="id" value={id} />
+          <ImageUploadField id="file" />
           <div className="field-grid">
-            <div className="field">
-              <label htmlFor="file">Image (JPEG, PNG or WebP, up to 5 MB)</label>
-              <input id="file" name="file" type="file" accept="image/jpeg,image/png,image/webp" required />
-            </div>
             <div className="field">
               <label htmlFor="altEn">Alternative text (English)</label>
               <input id="altEn" name="altEn" required />
@@ -164,9 +166,7 @@ export default async function UnitEditPage({
               <input id="altAm" name="altAm" lang="am" />
             </div>
           </div>
-          <button className="button secondary" type="submit">
-            Upload image
-          </button>
+          <UploadButton>Upload image</UploadButton>
         </form>
       </section>
 

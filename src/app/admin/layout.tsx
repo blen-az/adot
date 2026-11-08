@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Ambient } from "@/components/Ambient";
 import { fontClasses } from "@/lib/fonts";
 import "../globals.css";
+import "./admin.css";
 
 export const dynamic = "force-dynamic";
 

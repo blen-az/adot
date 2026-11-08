@@ -162,7 +162,7 @@ export async function processNotifications(db: Db, mailer: Mailer, now = new Dat
   for (const { id } of due) await deliver(db, mailer, id, now);
 }
 
-function visibility(actor: Actor) {
+export function visibility(actor: Actor) {
   if (can(actor, "enquiries.readAll")) return undefined;
   return or(isNull(enquiries.assigneeId), eq(enquiries.assigneeId, actor.id));
 }
@@ -204,6 +204,58 @@ export async function listInbox(db: Db, actor: Actor, filters: InboxFilters = {}
     )
     .orderBy(desc(enquiries.createdAt))
     .limit(200);
+}
+
+const OPEN_STATUSES: EnquiryStatus[] = ["new", "contacted", "viewing_arranged"];
+
+export async function newEnquiryCount(db: Db, actor: Actor) {
+  assertCan(actor, "enquiries.read");
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(enquiries)
+    .where(and(visibility(actor), eq(enquiries.status, "new")));
+  return row.count;
+}
+
+/** Counts and recent items for the dashboard overview, limited to the enquiries this actor can see. */
+export async function enquirySummary(db: Db, actor: Actor, now = new Date()) {
+  assertCan(actor, "enquiries.read");
+  const count = sql<number>`count(*)::int`;
+  const byStatus = await db
+    .select({ status: enquiries.status, count })
+    .from(enquiries)
+    .where(visibility(actor))
+    .groupBy(enquiries.status);
+  const [lastWeek] = await db
+    .select({ count })
+    .from(enquiries)
+    .where(and(visibility(actor), gte(enquiries.createdAt, new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000))));
+  const [unassigned] = await db
+    .select({ count })
+    .from(enquiries)
+    .where(and(isNull(enquiries.assigneeId), inArray(enquiries.status, OPEN_STATUSES)));
+  const [failedNotifications] = await db
+    .select({ count: sql<number>`count(distinct ${enquiries.id})::int` })
+    .from(notificationAttempts)
+    .innerJoin(enquiries, eq(enquiries.id, notificationAttempts.enquiryId))
+    .where(and(visibility(actor), eq(notificationAttempts.status, "failed")));
+  const recent = await db
+    .select()
+    .from(enquiries)
+    .where(visibility(actor))
+    .orderBy(desc(enquiries.createdAt))
+    .limit(6);
+  const statusCounts = Object.fromEntries(byStatus.map((row) => [row.status, row.count])) as Partial<
+    Record<EnquiryStatus, number>
+  >;
+  return {
+    byStatus: statusCounts,
+    open: OPEN_STATUSES.reduce((sum, status) => sum + (statusCounts[status] ?? 0), 0),
+    lastWeek: lastWeek.count,
+    unassigned: unassigned.count,
+    failedNotifications: failedNotifications.count,
+    recent,
+  };
 }
 
 async function requireVisible(db: Db, actor: Actor, id: string) {
