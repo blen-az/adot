@@ -248,6 +248,19 @@ describe("answering", () => {
     expect(requests).toHaveLength(3);
   });
 
+  it("gives up when Gemini holds the request open", async () => {
+    server = createServer(() => {
+      // Never answers, like an overloaded model.
+    });
+    await new Promise<void>((resolve) => server?.listen(0, "127.0.0.1", resolve));
+    const { port } = server.address() as AddressInfo;
+    const client = new GoogleGenAI({ apiKey: "test", httpOptions: { baseUrl: `http://127.0.0.1:${port}` } });
+    const started = Date.now();
+    await expect(collect(streamAnswer(db, question, client, undefined, 300))).rejects.toThrow();
+    expect(Date.now() - started).toBeLessThan(5000);
+    server.closeAllConnections();
+  });
+
   it("fails without retrying when the quota runs out", async () => {
     const { client, requests } = await fakeApi([JSON.stringify({ error: { code: 429, message: "quota", status: "RESOURCE_EXHAUSTED" } })], 429);
     await expect(collect(streamAnswer(db, question, client))).rejects.toThrow();

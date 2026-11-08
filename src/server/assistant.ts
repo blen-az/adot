@@ -187,10 +187,17 @@ async function openStream(client: GoogleGenAI, params: Parameters<GoogleGenAI["m
     } catch (error) {
       const delay = RETRY_DELAYS_MS[attempt];
       if (!(error instanceof ApiError) || !RETRYABLE_STATUSES.has(error.status) || delay === undefined) throw error;
+      if (params.config?.abortSignal?.aborted) throw error;
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 }
+
+/**
+ * The longest a visitor waits for a whole answer, retries and lookups included. When Gemini is overloaded
+ * it can hold a request open for minutes; past this limit the visitor gets the fallback message instead.
+ */
+const ANSWER_TIMEOUT_MS = 45_000;
 
 /** Streams the answer as text. The caller saves the exchange, and is told if the model flags the question as unanswered. */
 export async function* streamAnswer(
@@ -198,7 +205,9 @@ export async function* streamAnswer(
   request: AskRequest,
   client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }),
   onUnanswered: () => void = () => {},
+  timeoutMs = ANSWER_TIMEOUT_MS,
 ) {
+  const abortSignal = AbortSignal.timeout(timeoutMs);
   const { faqs } = await getAssistantSettings(db);
   const tools = assistantTools(db, request.locale, onUnanswered);
   const contents: Content[] = request.messages.map(({ role, content }) => ({
@@ -207,6 +216,7 @@ export async function* streamAnswer(
   }));
   const config = {
     systemInstruction: buildSystem(request.locale, faqs),
+    abortSignal,
     maxOutputTokens: 2000,
     thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
     tools: [{ functionDeclarations: tools.map(({ name, description, parametersJsonSchema }) => ({ name, description, parametersJsonSchema })) }],
