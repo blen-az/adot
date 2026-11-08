@@ -1,4 +1,4 @@
-import { FinishReason, GoogleGenAI, ThinkingLevel, type Content, type FunctionCall, type Part } from "@google/genai";
+import { ApiError, FinishReason, GoogleGenAI, ThinkingLevel, type Content, type FunctionCall, type Part } from "@google/genai";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { rentLabel } from "@/components/rent";
@@ -171,6 +171,27 @@ async function callTool(tools: ReturnType<typeof assistantTools>, call: Function
   }
 }
 
+/** Waits between attempts when Gemini is briefly overloaded. Two retries keep the worst case to a few seconds. */
+const RETRY_DELAYS_MS = [800, 2000];
+/** Temporary server-side failures. 429 (quota) is left out: retrying a used-up quota only spends more of it. */
+const RETRYABLE_STATUSES = new Set([500, 503, 504]);
+
+/**
+ * Opens the response stream, retrying temporary Gemini errors. Only the opening request is retried,
+ * before any text has reached the visitor, so an answer is never repeated.
+ */
+async function openStream(client: GoogleGenAI, params: Parameters<GoogleGenAI["models"]["generateContentStream"]>[0]) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await client.models.generateContentStream(params);
+    } catch (error) {
+      const delay = RETRY_DELAYS_MS[attempt];
+      if (!(error instanceof ApiError) || !RETRYABLE_STATUSES.has(error.status) || delay === undefined) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 /** Streams the answer as text. The caller saves the exchange, and is told if the model flags the question as unanswered. */
 export async function* streamAnswer(
   db: Db,
@@ -195,7 +216,7 @@ export async function* streamAnswer(
   for (let turn = 0; turn < MAX_TURNS; turn++) {
     const parts: Part[] = [];
     let finishReason: FinishReason | undefined;
-    for await (const chunk of await client.models.generateContentStream({ model: MODEL, contents, config })) {
+    for await (const chunk of await openStream(client, { model: MODEL, contents, config })) {
       if (chunk.promptFeedback?.blockReason) throw new Error("Assistant declined the request");
       const [candidate] = chunk.candidates ?? [];
       finishReason = candidate?.finishReason ?? finishReason;

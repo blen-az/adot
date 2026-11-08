@@ -125,16 +125,20 @@ const textTurn = (finishReason: string) =>
 
 type FakeRequest = { url: string; body: Record<string, unknown> };
 
+type FakeTurn = string | { status: number; body: string };
+
 /** A local stand-in for the Gemini API, so the tool loop runs without a key or any cost. */
-async function fakeApi(turns: string[], status = 200) {
+async function fakeApi(turns: FakeTurn[], status = 200) {
   const requests: FakeRequest[] = [];
   server = createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => (body += chunk));
     req.on("end", () => {
       requests.push({ url: req.url ?? "", body: JSON.parse(body) });
-      res.writeHead(status, { "Content-Type": status === 200 ? "text/event-stream" : "application/json" });
-      res.end(turns.shift());
+      const turn = turns.shift() ?? "";
+      const reply = typeof turn === "string" ? { status, body: turn } : turn;
+      res.writeHead(reply.status, { "Content-Type": reply.status === 200 ? "text/event-stream" : "application/json" });
+      res.end(reply.body);
     });
   });
   await new Promise<void>((resolve) => server?.listen(0, "127.0.0.1", resolve));
@@ -225,6 +229,23 @@ describe("answering", () => {
     const { client, requests } = await fakeApi([toolTurn(), toolTurn(), toolTurn(), toolTurn(), toolTurn()]);
     await expect(collect(streamAnswer(db, question, client))).rejects.toThrow("too many");
     expect(requests).toHaveLength(4);
+  });
+
+  const overloaded = {
+    status: 503,
+    body: JSON.stringify({ error: { code: 503, message: "high demand", status: "UNAVAILABLE" } }),
+  };
+
+  it("retries when Gemini is briefly overloaded", async () => {
+    const { client, requests } = await fakeApi([overloaded, textTurn("STOP")]);
+    expect(await collect(streamAnswer(db, question, client))).toBe("One unit is available.");
+    expect(requests).toHaveLength(2);
+  });
+
+  it("gives up after two retries", async () => {
+    const { client, requests } = await fakeApi([overloaded, overloaded, overloaded, textTurn("STOP")]);
+    await expect(collect(streamAnswer(db, question, client))).rejects.toThrow();
+    expect(requests).toHaveLength(3);
   });
 
   it("fails without retrying when the quota runs out", async () => {
