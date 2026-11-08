@@ -1,7 +1,9 @@
-import { readMedia } from "@/server/media";
+import { readMedia, remoteMediaUrl } from "@/server/media";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ file: string }> }) {
   const { file } = await params;
+  const remote = remoteMediaUrl(file);
+  if (remote) return Response.redirect(remote, 308);
   const media = await readMedia(file);
   if (!media) return new Response("Not found", { status: 404 });
   return new Response(new Uint8Array(media.bytes), {
