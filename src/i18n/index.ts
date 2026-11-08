@@ -49,6 +49,19 @@ const en = {
             "Showtimes and ticket prices aren't on this website yet. Until they are, please ask at the cinema or send us an enquiry and our team will reply.",
           ],
         },
+        {
+          heading: "Films for everyone",
+          body: [
+            "We want Adot Cinema Theater to be a place where everyone can find something to enjoy, whether you're planning a family outing, a night out with friends or some time to yourself.",
+            "As programming is confirmed, we'll share what's showing here so you can plan ahead.",
+          ],
+        },
+        {
+          heading: "Groups and special occasions",
+          body: [
+            "Thinking of bringing a group, or marking a special occasion at the cinema? Send us an enquiry with the details and our team will let you know what's possible.",
+          ],
+        },
       ],
       action: "Ask about the cinema",
     },
@@ -68,6 +81,18 @@ const en = {
             "Membership options, classes and opening hours will be published here soon. To ask about joining now, send us an enquiry and our team will get back to you.",
           ],
         },
+        {
+          heading: "Train at your own pace",
+          body: [
+            "Everyone's goals are different. Some people come to build strength, some to stay active, and some simply to feel better day to day. Adot Gymnasium is a place to work towards your goals at a pace that suits you.",
+          ],
+        },
+        {
+          heading: "New to the gym?",
+          body: [
+            "If you're not sure where to start, that's fine. Send us an enquiry and tell us a little about what you'd like to achieve, and our team will tell you about the options.",
+          ],
+        },
       ],
       action: "Ask about membership",
     },
@@ -85,6 +110,18 @@ const en = {
           body: [
             "Visitors come to the building for the cinema and the gym, so the businesses here have a ready audience.",
             "Browse the commercial units available now to compare floors, sizes and terms. If nothing fits yet, tell us what you need and we'll contact you when a suitable space opens up.",
+          ],
+        },
+        {
+          heading: "Finding your way around",
+          body: [
+            "When the directory is published, each listing will help you see what a business offers and where it is in the building, so you can go straight to what you need.",
+          ],
+        },
+        {
+          heading: "Already a tenant?",
+          body: [
+            "If your business operates at Adot Complex and you'd like it included in the directory, contact us through the enquiry form and our team will be in touch.",
           ],
         },
       ],
@@ -112,6 +149,18 @@ const en = {
             "If you're coming to see a unit, request a viewing through the enquiry form. Our leasing team will confirm the date and time with you before your visit.",
           ],
         },
+        {
+          heading: "Make a day of it",
+          body: [
+            "With a cinema, a gym and a range of businesses in one building, it's easy to combine errands, exercise and entertainment in a single trip.",
+          ],
+        },
+        {
+          heading: "Questions before you come",
+          body: [
+            "If there's anything you'd like to know before your visit, try Ask Adot on this website or send us an enquiry. Our team is happy to help.",
+          ],
+        },
       ],
       action: "Request a viewing",
     },
@@ -136,6 +185,18 @@ const en = {
           heading: "In English and Amharic",
           body: ["This website and our team serve visitors in both English and Amharic."],
         },
+        {
+          heading: "Information you can rely on",
+          body: [
+            "We keep this website up to date. When a commercial space becomes available or is leased, the listings change to match, so what you see here reflects what's open now.",
+          ],
+        },
+        {
+          heading: "Working with our team",
+          body: [
+            "Every enquiry sent through this website goes to Adot staff, who follow it up personally. Whether you're a visitor, a member or a business looking for space, we aim to make it simple to get the answers you need.",
+          ],
+        },
       ],
       action: "Get in touch",
     },
@@ -153,6 +214,19 @@ const en = {
           heading: "Ask Adot",
           body: [
             "For quick answers about the complex and the spaces available, try Ask Adot, the assistant on this website. If you'd like a call back, use \"Leave your details\" and your message goes straight to our staff.",
+          ],
+        },
+        {
+          heading: "What to include",
+          body: [
+            "The more you tell us, the more helpful our reply can be. If you're asking about a space, mention the unit reference if you have one, the approximate area you need and what you plan to use it for.",
+            "For anything else, a short description of your question is enough to get started.",
+          ],
+        },
+        {
+          heading: "What happens next",
+          body: [
+            "Our team reviews every enquiry and replies using the contact method you chose. Keep your reference number handy in case you need to follow up.",
           ],
         },
       ],
@@ -185,6 +259,18 @@ const en = {
           heading: "Your choices",
           body: [
             "To ask what information we hold about you, or to have it corrected or deleted, contact us through the enquiry form.",
+          ],
+        },
+        {
+          heading: "Who can see your information",
+          body: [
+            "Enquiry details are kept in Adot's internal system and are available only to Adot staff who need them to respond to you.",
+          ],
+        },
+        {
+          heading: "Changes to this notice",
+          body: [
+            "We may update this notice as the website grows and new services are added. The current version will always be on this page.",
           ],
         },
       ],
@@ -348,6 +434,19 @@ const am: Dictionary = {
             "የፊልም ሰዓቶችና የትኬት ዋጋዎች ገና በዚህ ድረ-ገጽ ላይ አልወጡም። እስኪወጡ ድረስ እባክዎ በሲኒማው ይጠይቁ ወይም ጥያቄ ይላኩልን፤ ቡድናችን ምላሽ ይሰጣል።",
           ],
         },
+        {
+          heading: "ለሁሉም የሚሆኑ ፊልሞች",
+          body: [
+            "ለቤተሰብ ጉዞ፣ ከጓደኞች ጋር ለምሽት መውጫ ወይም ለራስዎ ጊዜ ቢያቅዱ፣ አዶት ሲኒማ ቴአትር ሁሉም ሰው የሚወደውን የሚያገኝበት ቦታ እንዲሆን እንፈልጋለን።",
+            "የሚታዩ ፊልሞች ሲረጋገጡ አስቀድመው ማቀድ እንዲችሉ እዚህ እናሳውቃለን።",
+          ],
+        },
+        {
+          heading: "ቡድኖችና ልዩ አጋጣሚዎች",
+          body: [
+            "በቡድን ለመምጣት ወይም ልዩ አጋጣሚን በሲኒማው ለማክበር እያሰቡ ነው? ዝርዝሩን የያዘ ጥያቄ ይላኩልን፤ ቡድናችን የሚቻለውን ያሳውቅዎታል።",
+          ],
+        },
       ],
       action: "ስለ ሲኒማው ይጠይቁ",
     },
@@ -367,6 +466,18 @@ const am: Dictionary = {
             "የአባልነት አማራጮች፣ ክፍለ ጊዜዎችና የሥራ ሰዓቶች በቅርቡ እዚህ ይወጣሉ። አሁን ለመመዝገብ ከፈለጉ ጥያቄ ይላኩልን፤ ቡድናችን ያገኝዎታል።",
           ],
         },
+        {
+          heading: "በራስዎ ፍጥነት ያሠልጥኑ",
+          body: [
+            "የእያንዳንዱ ሰው ግብ የተለያየ ነው። አንዳንዶች ጥንካሬ ለመገንባት፣ አንዳንዶች ንቁ ለመሆን፣ ሌሎች ደግሞ በየቀኑ የተሻለ ስሜት እንዲሰማቸው ይመጣሉ። አዶት ጂምናዚየም በሚስማማዎ ፍጥነት ወደ ግብዎ የሚጓዙበት ቦታ ነው።",
+          ],
+        },
+        {
+          heading: "ለጂም አዲስ ነዎት?",
+          body: [
+            "ከየት እንደሚጀምሩ እርግጠኛ ካልሆኑ ችግር የለም። ጥያቄ ይላኩልንና ማሳካት የሚፈልጉትን በአጭሩ ይንገሩን፤ ቡድናችን ስላሉት አማራጮች ይነግርዎታል።",
+          ],
+        },
       ],
       action: "ስለ አባልነት ይጠይቁ",
     },
@@ -384,6 +495,18 @@ const am: Dictionary = {
           body: [
             "ጎብኚዎች ለሲኒማውና ለጂሙ ወደ ሕንፃው ስለሚመጡ፣ እዚህ ያሉ ንግዶች ዝግጁ ደንበኛ አላቸው።",
             "ፎቅን፣ ስፋትንና ውሎችን ለማነጻጸር አሁን የሚገኙ የንግድ ክፍሎችን ይመልከቱ። ተስማሚ ቦታ ከሌለ የሚፈልጉትን ይንገሩን፤ ቦታ ሲከፈት እናገኝዎታለን።",
+          ],
+        },
+        {
+          heading: "በሕንፃው ውስጥ መንገድዎን ለማግኘት",
+          body: [
+            "ማውጫው ሲወጣ እያንዳንዱ ዝርዝር አንድ ንግድ የሚሰጠውን አገልግሎትና በሕንፃው ውስጥ ያለበትን ቦታ ያሳያል፤ ስለዚህ ወደሚፈልጉት በቀጥታ መሄድ ይችላሉ።",
+          ],
+        },
+        {
+          heading: "ተከራይ ነዎት?",
+          body: [
+            "ንግድዎ በአዶት ኮምፕሌክስ የሚሠራ ከሆነና በማውጫው ውስጥ እንዲካተት ከፈለጉ በመጠየቂያ ቅጹ ያግኙን፤ ቡድናችን ያገኝዎታል።",
           ],
         },
       ],
@@ -411,6 +534,18 @@ const am: Dictionary = {
             "ክፍል ለማየት የሚመጡ ከሆነ በመጠየቂያ ቅጹ ጉብኝት ይጠይቁ። የኪራይ ቡድናችን ከጉብኝትዎ በፊት ቀኑንና ሰዓቱን ያረጋግጥልዎታል።",
           ],
         },
+        {
+          heading: "ቀኑን በሙሉ ይደሰቱ",
+          body: [
+            "ሲኒማ፣ ጂምና የተለያዩ ንግዶች በአንድ ሕንፃ ውስጥ ስላሉ ጉዳዮችን፣ የአካል እንቅስቃሴንና መዝናኛን በአንድ ጉዞ ማጣመር ቀላል ነው።",
+          ],
+        },
+        {
+          heading: "ከመምጣትዎ በፊት ጥያቄ ካለዎት",
+          body: [
+            "ከጉብኝትዎ በፊት ማወቅ የሚፈልጉት ነገር ካለ በዚህ ድረ-ገጽ ያለውን Ask Adot ይጠይቁ ወይም ጥያቄ ይላኩልን። ቡድናችን ለመርዳት ዝግጁ ነው።",
+          ],
+        },
       ],
       action: "ጉብኝት ይጠይቁ",
     },
@@ -435,6 +570,18 @@ const am: Dictionary = {
           heading: "በእንግሊዝኛና በአማርኛ",
           body: ["ይህ ድረ-ገጽና ቡድናችን ጎብኚዎችን በእንግሊዝኛና በአማርኛ ያገለግላሉ።"],
         },
+        {
+          heading: "ሊተማመኑበት የሚችሉት መረጃ",
+          body: [
+            "ይህን ድረ-ገጽ ወቅታዊ አድርገን እንይዛለን። የንግድ ቦታ ሲከፈት ወይም ሲከራይ ዝርዝሮቹ በዚያው መሠረት ይቀየራሉ፤ ስለዚህ እዚህ የሚያዩት አሁን ክፍት የሆነውን ያሳያል።",
+          ],
+        },
+        {
+          heading: "ከቡድናችን ጋር መሥራት",
+          body: [
+            "በዚህ ድረ-ገጽ የሚላክ እያንዳንዱ ጥያቄ ወደ አዶት ሠራተኞች ይደርሳል፤ እነሱም በግል ይከታተሉታል። ጎብኚ፣ አባል ወይም ቦታ የሚፈልግ ንግድ ቢሆኑ የሚፈልጉትን መልስ በቀላሉ እንዲያገኙ እንጥራለን።",
+          ],
+        },
       ],
       action: "ያግኙን",
     },
@@ -452,6 +599,19 @@ const am: Dictionary = {
           heading: "Ask Adot",
           body: [
             "ስለ ኮምፕሌክሱና ስለሚገኙ ቦታዎች ፈጣን መልስ ለማግኘት በዚህ ድረ-ገጽ ያለውን Ask Adot ረዳት ይሞክሩ። እንድንደውልልዎ ከፈለጉ «መረጃዎን ይተዉ» የሚለውን ይጠቀሙ፤ መልእክትዎ በቀጥታ ወደ ሠራተኞቻችን ይሄዳል።",
+          ],
+        },
+        {
+          heading: "ምን ማካተት እንዳለብዎ",
+          body: [
+            "ብዙ በነገሩን መጠን ምላሻችን የበለጠ ጠቃሚ ይሆናል። ስለ ቦታ የሚጠይቁ ከሆነ ካለዎት የክፍሉን መለያ ቁጥር፣ የሚፈልጉትን ግምታዊ ስፋትና ለምን ሊጠቀሙበት እንዳሰቡ ይጥቀሱ።",
+            "ለሌሎች ጉዳዮች የጥያቄዎ አጭር መግለጫ ለመጀመር በቂ ነው።",
+          ],
+        },
+        {
+          heading: "ቀጥሎ ምን ይሆናል",
+          body: [
+            "ቡድናችን እያንዳንዱን ጥያቄ ይመለከታል፤ በመረጡት የመገናኛ መንገድም ምላሽ ይሰጣል። መከታተል ቢያስፈልግዎ የመለያ ቁጥርዎን ይያዙ።",
           ],
         },
       ],
@@ -481,6 +641,18 @@ const am: Dictionary = {
         {
           heading: "የእርስዎ ምርጫዎች",
           body: ["ስለእርስዎ ምን መረጃ እንደያዝን ለመጠየቅ ወይም እንዲስተካከል ወይም እንዲሰረዝ ለማድረግ በመጠየቂያ ቅጹ ያግኙን።"],
+        },
+        {
+          heading: "መረጃዎን ማን ማየት ይችላል",
+          body: [
+            "የጥያቄ መረጃዎች በአዶት ውስጣዊ ሥርዓት ውስጥ ይቀመጣሉ፤ ለእርስዎ ምላሽ ለመስጠት የሚያስፈልጋቸው የአዶት ሠራተኞች ብቻ ያዩዋቸዋል።",
+          ],
+        },
+        {
+          heading: "በዚህ ማስታወቂያ ላይ የሚደረጉ ለውጦች",
+          body: [
+            "ድረ-ገጹ ሲያድግና አዳዲስ አገልግሎቶች ሲጨመሩ ይህን ማስታወቂያ ልናሻሽለው እንችላለን። የአሁኑ ቅጂ ሁልጊዜ በዚህ ገጽ ላይ ይገኛል።",
+          ],
         },
       ],
       action: "ያግኙን",
